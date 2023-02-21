@@ -2,6 +2,12 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const generateRandomString = () => {
+  return Math.random().toString(36).substring(3, 9);
+};
+
+app.use(express.urlencoded({ extended: true }));
+
 app.set("view engine", "ejs");
 
 // database to keep track of all URLs and their shortened forms
@@ -10,7 +16,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.use(express.urlencoded({ extended: true }));
+
 
 app.get("/", (req, res) => {
   res.send("Hello");
