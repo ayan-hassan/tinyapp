@@ -50,12 +50,19 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${tinyURL}`); // redirects user to page of generated tiny url
 });
 
+app.post("/urls/:tinyURL/delete", (req, res) => {
+  delete urlDatabase[req.params.tinyURL];
+  res.redirect("/urls");
+});
+
 app.get("/urls/:tinyURL", (req, res) => {
   const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL]  };
   const longURL = urlDatabase[req.params.tinyURL];
   res.redirect(longURL);
   res.render("urls_show", templateVars);
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`TinyAapp listening on port ${PORT}!`);
