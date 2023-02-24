@@ -90,15 +90,20 @@ app.post("urls/:tinyURL", (req, res) => {
 });
 
 //user login route (just email)
-app.post("/urls/login", (req, res) => {
+app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie('username', username);
   res.redirect("/urls");
 });
 
-app.post("/urls/logout", (req, res) => {
+app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
+});
+
+app.get("/register", (req, res) => {
+  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], username: req.cookies["username"]};
+  res.render("urls_register", templateVars);
 });
 
 
