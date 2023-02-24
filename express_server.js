@@ -35,6 +35,8 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+
+  //////ADD COOKIES HERE/////// check W3D4 lecture
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
@@ -55,13 +57,22 @@ app.post("/urls/:tinyURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/urls/:tinyURL", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL]  };
-  const longURL = urlDatabase[req.params.tinyURL];
-  res.redirect(longURL);
-  res.render("urls_show", templateVars);
+//route to update long url// NOT WORKING
+app.get("/u/:tinyURL", (req, res) => {
+  const tinyURL = req.params.tinyURL;
+  res.redirect(urlDatabase[tinyURL]);
 });
 
+//redirects to longURL
+app.get("/urls/:tinyURL", (req, res) => {
+  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL]  };
+  res.render("urls_show", templateVars);
+});
+//user login route + COOKIES W3D2 // NOT WORKING W3D2
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
 
 
 app.listen(PORT, () => {
