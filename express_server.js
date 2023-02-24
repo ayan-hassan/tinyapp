@@ -45,6 +45,8 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+
+
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
   let tinyURL = generateRandomString();
@@ -57,19 +59,29 @@ app.post("/urls/:tinyURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//route to update long url// NOT WORKING
+//redirects to longURL
 app.get("/u/:tinyURL", (req, res) => {
   const tinyURL = req.params.tinyURL;
   res.redirect(urlDatabase[tinyURL]);
 });
 
-//redirects to longURL
+
+//links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
   const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL]  };
   res.render("urls_show", templateVars);
 });
+
+//updates longURL// FIX LATER
+app.post("urls/:tinyURL", (req, res) => {
+  let tinyURL = req.params.tinyURL;
+  let longURL = req.body.longURL;
+  urlDatabase[tinyURL] = longURL;
+  res.redirect("/urls");
+});
+
 //user login route + COOKIES W3D2 // NOT WORKING W3D2
-app.post("/login", (req, res) => {
+app.post("/urls/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("/urls");
 });
