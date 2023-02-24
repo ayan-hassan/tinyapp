@@ -4,6 +4,8 @@
     - What type of status code do our redirects have? What does this status code mean? */
 
 const express = require("express");
+const cookieParser = require('cookie-parser');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -12,10 +14,9 @@ const generateRandomString = () => {
 };
 
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
-
-// ROUTES //
 
 // database to keep track of all URLs and their shortened forms
 const urlDatabase = {
@@ -23,26 +24,34 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// ------------------------ ROUTES ------------------------------- //
+
 app.get("/", (req, res) => {
-  res.send("Hello");
+  res.redirect("/urls");
+});
+
+app.get("/hello", (req, res) => {
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.get("/urls", (req, res) => {
-
-  //////ADD COOKIES HERE/////// check W3D4 lecture
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 
@@ -68,7 +77,7 @@ app.get("/u/:tinyURL", (req, res) => {
 
 //links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL]  };
+  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], username: req.cookies["username"]};
   res.render("urls_show", templateVars);
 });
 
@@ -80,9 +89,15 @@ app.post("urls/:tinyURL", (req, res) => {
   res.redirect("/urls");
 });
 
-//user login route + COOKIES W3D2 // NOT WORKING W3D2
+//user login route (just email)
 app.post("/urls/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.redirect("/urls");
+});
+
+app.post("/urls/logout", (req, res) => {
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
