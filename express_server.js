@@ -101,6 +101,13 @@ app.post("/urls/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/urls/register", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_register", templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`TinyAapp listening on port ${PORT}!`);
