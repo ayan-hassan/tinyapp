@@ -13,6 +13,17 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(3, 9);
 };
 
+///user lookup helper function
+const getByUserEmail = (users, email) => {
+  for (let randomID in users) {
+    if (email === users[randomID].email) {
+      return users[randomID];
+    } else {
+      return null;
+    }
+  }
+};
+
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -88,7 +99,9 @@ app.get("/u/:tinyURL", (req, res) => {
 
 //links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], user: users[req.cookies["user_id"]]};
+  const templateVars = { tinyURL: req.params.tinyURL,
+    longURL: urlDatabase[req.params.tinyURL],
+    user: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
@@ -100,14 +113,10 @@ app.post("urls/:tinyURL", (req, res) => {
   res.redirect("/urls");
 });
 
-// app.get("/login", (req, res) => {
-//   if (user) {
-//     res.redirect("/urls") 
-//     } else {
-//       res.redirect("/login")
-//     }
-//   }
-// });
+app.get("/login", (req, res) => {
+  const templateVars = { user: users[req.cookies["user_id"]] };
+  res.redirect("urls/login", templateVars);
+});
 
 //user login route (just email)
 app.post("/login", (req, res) => {
@@ -117,12 +126,12 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], user: users[req.cookies["user_id"]] };
+  const templateVars = { user: users[req.cookies["user_id"]] };
   res.render("urls_register", templateVars);
 });
 
@@ -130,20 +139,18 @@ app.post("/register", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let randomID = generateRandomString();
-  if (email === "" || password || "") {
-    res.statusCode(404).send("Please enter your username and/or password to register");
-  } else
-  if (email === users[randomID].email) {
-    res.statusCode(404).send("This email is already associated with an account. Please log in or register a new account");
-  } else {
-  //generate random user ID & add user
-    users[randomID] = { id: randomID, email: email, password: password };
+  if (email === "" || password === "") {
+    res.status(400).send("Please enter a valid username and/or password to register");
   }
-  //set cookie to new id
-  res.cookie('user_id', randomID);
-  //test user object is proper appeneded by printing to console
-  const templateVars = { user: users[req.cookies["user_id"]] };
-  res.redirect("/urls", templateVars);
+  if (getByUserEmail(email) === users[randomID]) {
+    res.status(400).send("This email is already associated with an account. Please log in or register a new account");
+  } else {
+  // //generate random user ID & add user
+    users[randomID] = { id: randomID, email: email, password: password };
+    res.cookie('user_id', randomID);
+  }
+  // //set cookie to new id
+  res.redirect("/urls");
 });
 
 

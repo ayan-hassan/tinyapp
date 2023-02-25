@@ -20,26 +20,18 @@
       </div>
     </div>
     <% if (user) { %>
-      <form class="form-inline" action="/logout" method="POST">
-        <p>Logged in as <%= users[randomID].email %></p>
+      <div>
+      <form class="nav-item nav-link" action="/logout" method="POST">
+        Logged in as: <%= user.email %>
         <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247)" class="btn btn-primary">Logout</button>
       </form>
-    <% } else { %>
-      <div>
-        <form action="/login" method="POST">
-          <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247)"class="btn btn-primary">Log In</button>
-        </form>
       </div>
-    <form class="form-inline" action="/login" method="POST">
-        <label for="email"><b>Log In:</b></label>
-        <input
-          class="form-control"
-          type="text"
-          name=email
-          style="width: 200px; margin: 0.5em"
-        />
-        <button type="submit" class="btn btn-primary">Log In</button>
-    </form>
+    <% } else { %>
+    <div>
+      <form action="/login" method="POST">
+        <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247)"class="btn btn-primary">Log In</button>
+      </form>
+    </div>
     <% } %>
   </nav>
 </header>
