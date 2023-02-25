@@ -13,6 +13,19 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(3, 9);
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -41,7 +54,7 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
@@ -49,12 +62,10 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });
-
-
 
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
@@ -77,7 +88,7 @@ app.get("/u/:tinyURL", (req, res) => {
 
 //links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], username: req.cookies["username"]};
+  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], user: users[req.cookies["user_id"]]};
   res.render("urls_show", templateVars);
 });
 
@@ -88,6 +99,15 @@ app.post("urls/:tinyURL", (req, res) => {
   urlDatabase[tinyURL] = longURL;
   res.redirect("/urls");
 });
+
+// app.get("/login", (req, res) => {
+//   if (user) {
+//     res.redirect("/urls") 
+//     } else {
+//       res.redirect("/login")
+//     }
+//   }
+// });
 
 //user login route (just email)
 app.post("/login", (req, res) => {
@@ -102,8 +122,28 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], username: req.cookies["username"]};
+  const templateVars = { tinyURL: req.params.tinyURL, longURL: urlDatabase[req.params.tinyURL], user: users[req.cookies["user_id"]] };
   res.render("urls_register", templateVars);
+});
+
+app.post("/register", (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  let randomID = generateRandomString();
+  if (email === "" || password || "") {
+    res.statusCode(404).send("Please enter your username and/or password to register");
+  } else
+  if (email === users[randomID].email) {
+    res.statusCode(404).send("This email is already associated with an account. Please log in or register a new account");
+  } else {
+  //generate random user ID & add user
+    users[randomID] = { id: randomID, email: email, password: password };
+  }
+  //set cookie to new id
+  res.cookie('user_id', randomID);
+  //test user object is proper appeneded by printing to console
+  const templateVars = { user: users[req.cookies["user_id"]] };
+  res.redirect("/urls", templateVars);
 });
 
 
