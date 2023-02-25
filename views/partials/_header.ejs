@@ -16,22 +16,18 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Create Account</a>
       </div>
     </div>
-    <% if (user) { %>
-      <div>
-      <form class="nav-item nav-link" action="/logout" method="POST">
-        Logged in as: <%= user.email %>
-        <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247)" class="btn btn-primary">Logout</button>
-      </form>
-      </div>
-    <% } else { %>
-    <div>
-      <form action="/login" method="POST">
-        <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247)"class="btn btn-primary">Log In</button>
-      </form>
-    </div>
-    <% } %>
+    <% if(!user) { %>
+      <a class="nav-item nav-link" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgba(243, 244, 247, 0.532)" href="/login">Log In</a>
+      <a class="nav-item nav-link" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(255, 255, 255); color:rgb(243, 244, 247, 0.532)" href="/register">Create Account</a>    
+   
+   
+   <% } else {%> 
+    Logged in as <%= user.email %>!
+     <form class="nav-item nav-link"  action="/logout %>" method="POST">
+      <button type="submit" style="background-color:rgba(253, 253, 253, 0); border-color:rgb(0, 0, 0); color:rgb(5, 5, 6)" class="btn btn-primary">Logout</button>  
+     </form>
+     <% } %>
   </nav>
 </header>
