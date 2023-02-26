@@ -17,10 +17,9 @@
       <div class="card-body">
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">
-          Short URL ID: <a href="/u/<%= tinyURL %>"><%= tinyURL %></a>
+          Short URL ID: <a href="/u/<%= tinyURL %>"><%= tinyURL %></a> 
         </p>
       </div>
-
       <div class="card-footer text-muted">
         <h3>Edit</h3>
         <form class="form-inline" action="/urls/<%= tinyURL %>" method="POST">
@@ -35,7 +34,6 @@
         </form>
       </div>
     </div>
-    
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
