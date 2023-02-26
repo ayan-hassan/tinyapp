@@ -31,21 +31,27 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let id in urls) { %>
-            <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
-              <td>
-                <form method="GET" action="/urls/<%= id %>">
-                <button type="submit" style="background-color:white; border-color:rgb(0, 64, 255); color:rgb(0, 64, 255)" class="btn btn-primary">Edit</button>
-                  </form>
-              </td>
-              <td>
-                <form method="POST" action="/urls/<%= id %>/delete">
-                <button type="submit" style="background-color:white; border-color:red; color:red" class="btn btn-primary">Delete</button>
+          <% if (!user) { %>
+            <div class="alert alert-warning" role="alert">
+                Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to view your personal inventory of tiny URLs.
+            </div>
+          <% } else { %>
+          <% for(let url in urls) { %>
+          <tr>
+            <td><%= url %></td>
+            <td><%= urls[url].longURL %></td>
+            <td>
+              <a href="/urls/<%= url %>">
+                <button type="button" class="btn btn-outline-primary">Edit</button>
+              </a>
+            </td>
+            <td>
+              <form method="POST" action="/urls/<%= url %>/delete">
+              <button type="submit" class="btn btn-outline-danger">Delete</button>
               </form>
-              </td>
-            </tr>
+            </td>
+          </tr>
+          <% } %>
           <% } %>
         </tbody>
       </table>
