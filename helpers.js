@@ -1,8 +1,9 @@
+//generated random string of six numbers and letters
 const generateRandomString = () => {
   return Math.random().toString(36).substring(3, 9);
 };
 
-///user lookup helper function
+///looks up user in database using email and returns matching ID
 const getByUserEmail = (email, userDatabase) => {
   for (const user in userDatabase) {
     if (userDatabase[user].email === email) {
@@ -11,6 +12,7 @@ const getByUserEmail = (email, userDatabase) => {
   }
 };
 
+//checks if email matches user in database
 const emailHasUser = function(email, userDatabase) {
   for (const user in userDatabase) {
     if (userDatabase[user].email === email) {
@@ -20,7 +22,7 @@ const emailHasUser = function(email, userDatabase) {
   return false;
 };
 
-//Checks if current cookie corresponds with a user in the userDatabase //
+//Checks if current cookie corresponds with a user in database
 const cookieIsCurrentUser = (cookie, userDatabase) => {
   for (const user in userDatabase) {
     if (cookie === user) {
