@@ -18,7 +18,7 @@
           <% if (!user) { %>
             <div class="alert alert-warning" role="alert">
                 This link is not associated with your account.
-                Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">register</a> to view your personal inventory of tiny URLs.
+                Please <a href="/login" class="alert-link">login</a> or <a href="/register" class="alert-link">create an account</a> to view your personal inventory of tiny URLs.
             </div>
           <% } else if (user.id !== urlUserID) { %>
             <div class="alert alert-warning" role="alert">
