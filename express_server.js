@@ -27,8 +27,14 @@ const users = {
 
 // database to keep track of all URLs and their shortened forms
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const authenticateUser = (email, password) => {
@@ -72,6 +78,26 @@ const passwordLookup = (password, users) => {
   return false;
 };
 
+//Checks if current cookie corresponds with a user in the userDatabase //
+const cookieIsCurrentUser = (cookie, userDatabase) => {
+  for (const user in userDatabase) {
+    if (cookie === user) {
+      return true;
+    }
+  } return false;
+};
+
+//checks if URLs' useriD matches the currently logged in user
+const urlsforUser = (id) => {
+  let result = {};
+  for (const user in urlDatabase) {
+    if (urlDatabase[user].userId === id) {
+      result[user] = urlDatabase[user];
+    }
+  }
+  return result;
+};
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -91,23 +117,32 @@ app.get("/urls.json", (req, res) => {
 //----------------------------------------------------------------------------------
 
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
-  };
-  res.render("urls_index", templateVars);
+  if (!cookieIsCurrentUser(users[req.cookies["user_id"]])) {
+    res.send("Please login in order to view your shortened URLs.");
+  } else if
+  (cookieIsCurrentUser(users[req.cookies["user_id"]]) === urlsforUser()) {
+    const templateVars = {
+      urls: urlDatabase,
+      user: users[req.cookies["user_id"]]
+    };
+    res.render("urls_index", templateVars);
+  }
 });
 
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
   let tinyURL = generateRandomString();
-  urlDatabase[tinyURL] = longURL;
+  urlDatabase[tinyURL].longURL = longURL;
   res.redirect(`/urls/${tinyURL}`); // redirects user to page of generated tiny url
 });
 
 //----------------------------------------------------------------------------------
 
-app.get("/urls/new", (req, res) => {
+app.get("/urls/new", (req, res) => { ///////will need to be fixed
+  if (!cookieIsCurrentUser(users[req.cookies["user_id"]])) {
+    res.send("Please login or create an account in order to shorten URLs.");
+    res.redirect("/login");
+  }
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
@@ -118,8 +153,16 @@ app.get("/urls/new", (req, res) => {
 //----------------------------------------------------------------------------------
 
 app.post("/urls/:tinyURL/delete", (req, res) => {
-  delete urlDatabase[req.params.tinyURL];
-  res.redirect("/urls");
+  if ((cookieIsCurrentUser(users[req.cookies["user_id"]]) !== urlsforUser())) {
+    res.send("You are unauthorized to delete this tiny URL");
+  }
+  if (!cookieIsCurrentUser(users[req.cookies["user_id"]])) {
+    res.send("Please login in order to delete your shortened URLs.");
+  } else if
+  (cookieIsCurrentUser(users[req.cookies["user_id"]]) === urlsforUser()) {
+    delete urlDatabase[req.params.tinyURL];
+    res.redirect("/urls");
+  }
 });
 
 //----------------------------------------------------------------------------------
@@ -127,6 +170,9 @@ app.post("/urls/:tinyURL/delete", (req, res) => {
 //redirects to longURL
 app.get("/u/:tinyURL", (req, res) => {
   const tinyURL = req.params.tinyURL;
+  if (!urlDatabase[tinyURL]) {
+    res.send("This shortened URL does not exist");
+  }
   res.redirect(urlDatabase[tinyURL]);
 });
 
@@ -134,23 +180,40 @@ app.get("/u/:tinyURL", (req, res) => {
     
 //links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
-  const templateVars = { tinyURL: req.params.tinyURL,
-    longURL: urlDatabase[req.params.tinyURL],
-    user: users[req.cookies["user_id"]]};
-  res.render("urls_show", templateVars);
+  if (!cookieIsCurrentUser(users[req.cookies["user_id"]])) {
+    res.send("Please login in order to view the shortened URL.");
+  }
+  if (cookieIsCurrentUser(users[req.cookies["user_id"]]) !== urlsforUser()) {
+    res.send("You do not own the tiny URL of the corresponding long URL");
+  } else {
+    if (cookieIsCurrentUser(users[req.cookies["user_id"]]) === urlsforUser()) {
+      const templateVars = { tinyURL: req.params.tinyURL,
+        longURL: urlDatabase[req.params.tinyURL].longURL,
+        user: users[req.cookies["user_id"]]};
+      res.render("urls_show", templateVars);
+    }
+  }
 });
     
 //updates longURL//
 app.post("/urls/:tinyURL", (req, res) => {
-  let tinyURL = req.params.tinyURL;
-  let longURL = req.body.longURL;
-  urlDatabase[tinyURL] = longURL;
-  res.redirect("/urls");
+  if ((cookieIsCurrentUser(users[req.cookies["user_id"]]) !== urlsforUser())) {
+    res.send("You are unauthorized to update this tiny URL");
+  }
+  if (!cookieIsCurrentUser(users[req.cookies["user_id"]])) {
+    res.send("Please login in order to update your shortened URLs.");
+  } else if
+  (cookieIsCurrentUser(users[req.cookies["user_id"]]) === urlsforUser()) {
+    let tinyURL = req.params.tinyURL;
+    let longURL = req.body.longURL;
+    urlDatabase[tinyURL].longURL = longURL;
+    res.redirect("/urls");
+  }
 });
     
 //----------------------------------------------------------------------------------
 
-app.get("/register", (req, res) => {
+app.get("/register", (req, res) => { ////logins not saving to object
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]] };
@@ -178,7 +241,7 @@ app.post("/register", (req, res) => {
 
 //----------------------------------------------------------------------------------
 
-app.get("/login", (req, res) => {
+app.get("/login", (req, res) => { ////NOT WORKING
   const templateVars = { user: users[req.cookies["user_id"]] };
   res.render("urls_login", templateVars);
 });
