@@ -34,7 +34,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//----------------------------------------------------------------------------------
+//----------------------------- URLS PAGE ------------------------------------------
 
 app.get("/urls", (req, res) => {
   let templateVars = {
@@ -57,9 +57,9 @@ app.post("/urls", (req, res) => {
   }
 });
 
-//----------------------------------------------------------------------------------
+//------------------------------ CREATING URLS PAGE ---------------------------------
 
-app.get("/urls/new", (req, res) => { ///////will need to be fixed
+app.get("/urls/new", (req, res) => {
   if (!cookieIsCurrentUser(req.session.user_id, users)) {
     res.redirect("/login");
   } else {
@@ -70,7 +70,7 @@ app.get("/urls/new", (req, res) => { ///////will need to be fixed
   }
 });
 
-//----------------------------------------------------------------------------------
+//----------------------------------- DELETE URLS ------------------------------------
 
 app.post("/urls/:tinyURL/delete", (req, res) => {
   const userID = req.session.user_id;
@@ -84,7 +84,7 @@ app.post("/urls/:tinyURL/delete", (req, res) => {
   }
 });
 
-//----------------------------------------------------------------------------------
+//------------------------------------ REDIRECT -----------------------------------------
 
 //redirects to longURL
 app.get("/u/:tinyURL", (req, res) => {
@@ -100,10 +100,10 @@ app.get("/u/:tinyURL", (req, res) => {
   }
 });
 
-//----------------------------------------------------------------------------------
+//------------------------------------ EDIT URL --------------------------------------------
     
 //links to edit page
-app.get("/urls/:tinyURL", (req, res) => { ///MIGHT COMEBACK AND FIX
+app.get("/urls/:tinyURL", (req, res) => {
   if (urlDatabase[req.params.tinyURL]) {
     let templateVars = {
       shortURL: req.params.tinyURL,
@@ -130,9 +130,9 @@ app.post("/urls/:tinyURL", (req, res) => {
   }
 });
     
-//----------------------------------------------------------------------------------
+//-------------------------------------- REGISTER --------------------------------------------
 
-app.get("/register", (req, res) => { ////logins not saving to object
+app.get("/register", (req, res) => {
   if (cookieIsCurrentUser(req.session.user_id, users) === true) {
     res.redirect("/urls");
   } else {
@@ -162,9 +162,9 @@ app.post("/register", (req, res) => {
   }
 });
 
-//----------------------------------------------------------------------------------
+//---------------------------------------- LOGIN -----------------------------------------
 
-app.get("/login", (req, res) => { ////NOT WORKING
+app.get("/login", (req, res) => {
   if (cookieIsCurrentUser(req.session.user_id, users)) {
     res.redirect("/urls");
   } else {
@@ -175,7 +175,6 @@ app.get("/login", (req, res) => { ////NOT WORKING
   }
 });
     
-//user login route (just email)
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -193,7 +192,7 @@ app.post("/login", (req, res) => {
   }
 });
 
-//----------------------------------------------------------------------------------
+//------------------------------------ LOGOUT -------------------------------------
 
 app.post("/logout", (req, res) => {
   req.session = null;
