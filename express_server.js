@@ -76,7 +76,7 @@ app.post("/urls/:tinyURL/delete", (req, res) => {
   const userID = req.session.user_id;
   const userUrls = urlsforUser(userID, urlDatabase);
   if (Object.keys(userUrls).includes(req.params.tinyURL)) {
-    const tinyURL = req.params.shortURL;
+    const tinyURL = req.params.tinyURL;
     delete urlDatabase[tinyURL];
     res.redirect('/urls');
   } else {
