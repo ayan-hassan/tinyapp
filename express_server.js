@@ -53,7 +53,7 @@ app.post("/urls", (req, res) => {
     };
     res.redirect(`/urls/${tinyURL}`);
   } else {
-    res.status(401).send("Please log in with a valid account in orderto create tiny URLs.");
+    res.status(401).send("Please log in with a valid account in order to create tiny URLs.");
   }
 });
 
@@ -104,9 +104,17 @@ app.get("/u/:tinyURL", (req, res) => {
     
 //links to edit page
 app.get("/urls/:tinyURL", (req, res) => {
+  let tinyURL = req.params.tinyURL;
+  let loggedIn = cookieIsCurrentUser(req.session.user_id, users);
+  if (!loggedIn) {
+    res.send("If you own this tiny URL, please login in order to view/ edit it.");
+  }
+  if (req.session.user_id !== urlDatabase[tinyURL].userID) {
+    res.send("This link is not associatd with your account.");
+  }
   if (urlDatabase[req.params.tinyURL]) {
     let templateVars = {
-      shortURL: req.params.tinyURL,
+      tinyURL: req.params.tinyURL,
       longURL: urlDatabase[req.params.tinyURL].longURL,
       urlUserID: urlDatabase[req.params.tinyURL].userID,
       user: users[req.session.user_id],
@@ -115,15 +123,16 @@ app.get("/urls/:tinyURL", (req, res) => {
   } else {
     res.status(404).send("The tiny URL you entered does not correspond with a registered long URL.");
   }
+
 });
     
 //updates longURL//
 app.post("/urls/:tinyURL", (req, res) => {
-  const userID = req.session.user_id;
-  const userUrls = urlsforUser(userID, urlDatabase);
-  if (Object.keys(userUrls).includes(req.params.id)) {
-    const tinyURL = req.params.id;
-    urlDatabase[tinyURL].longURL = req.body.newURL;
+  let tinyURL = req.params.tinyURL;
+  let newLongURL = req.body.newURL;
+  console.log(req.body);
+  if (req.session.user_id === urlDatabase[tinyURL].userID) {
+    urlDatabase[tinyURL].longURL = newLongURL;
     res.redirect('/urls');
   } else {
     res.status(401).send("You are not authorized to edit this tiny URL.");
